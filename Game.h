@@ -11,6 +11,7 @@
 #include <Ball.h>
 #include <Player.h>
 #include <AI.h>
+#include <Start.h>
 namespace Pong
 {
 #define PLAYER1 0
@@ -102,22 +103,31 @@ extern const int HEIGHT = 1080;
 
 	void Game::run(std::pair<int, int> players, bool offset)
 	{
-		using std::cout;
+		using std::cout; 
+		using std::get;
 
 		Uint64 frames = 0;
 		bool quit = false;
 		SDL_Event e;
-		Ball ball = Ball(&score,&frames, offset, WIDTH, HEIGHT);
-		PlayerContainer* player1 = new PlayerContainer(&ball, PLAYER1START, PLAYER1, players.first, WIDTH, HEIGHT);
-		PlayerContainer* player2 = new PlayerContainer(&ball, PLAYER2START, PLAYER2, players.second, WIDTH, HEIGHT);
+		Ball ball;// = Ball(&score,&frames, offset, WIDTH, HEIGHT);
+		PlayerContainer* player1;// = new PlayerContainer(&ball, PLAYER1START, PLAYER1, players.first, WIDTH, HEIGHT);
+		PlayerContainer* player2;// = new PlayerContainer(&ball, PLAYER2START, PLAYER2, players.second, WIDTH, HEIGHT);
+		std::tuple<int, int, int> settings;
+		Start* start = new Start();
 		
 		
 
 		if (init())
 		{
+			
 			ball.loadFX();
 			font = TTF_OpenFont("Assets/8-bit.ttf", 66);
+			settings = start->start(gRenderer, WIDTH, HEIGHT, gWindow, font);
 
+			std::cout << get<0>(settings) << ", " << get<1>(settings) << ", " << get<2>(settings) << "\n";
+			ball = Ball(&score, &frames, offset, WIDTH, HEIGHT, get<2>(settings));
+			player1 = new PlayerContainer(&ball, PLAYER1START, PLAYER1, get<0>(settings), WIDTH, HEIGHT);
+			player2 = new PlayerContainer(&ball, PLAYER2START, PLAYER2, get<1>(settings), WIDTH, HEIGHT);
 			if (font == NULL) { std::cout << TTF_GetError(); }
 			while (!quit)
 			{
@@ -133,6 +143,14 @@ extern const int HEIGHT = 1080;
 						//cout << "Quitting" << "\n";
 						quit = true;
 						SDL_Quit();
+					}
+					else if (e.type == SDL_KEYDOWN)
+					{
+						if (e.key.keysym.sym == SDLK_ESCAPE)
+						{
+							quit = true;
+							SDL_Quit();
+						}
 					}
 					player1->eventFunc(e);
 					player2->eventFunc(e);
@@ -183,7 +201,7 @@ extern const int HEIGHT = 1080;
 				// fps cap
 				Uint64 end = SDL_GetPerformanceCounter();
 				float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency();
-				SDL_Delay(floor(16.666f - elapsedMS));
+				SDL_Delay((Uint32)floor(16.666f - elapsedMS));
 
 				frames++;
 			}

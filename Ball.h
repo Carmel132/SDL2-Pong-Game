@@ -14,7 +14,7 @@ namespace Pong
 	class Ball
 	{
 	public:
-		Ball(std::pair<unsigned, unsigned>* _score = new std::pair<unsigned, unsigned>(), Uint64* _frames=0, bool mode = false, int _WIDTH = 1080, int _HEIGHT = 720);
+		Ball(std::pair<unsigned, unsigned>* _score = new std::pair<unsigned, unsigned>(), Uint64* _frames=0, bool mode = false, int _WIDTH = 1080, int _HEIGHT = 720, int cap = 75);
 		void wallCollision(bool audio=true);
 		void playerCollision(SDL_Rect* rect, int num);
 		void move(SDL_Rect* player1, SDL_Rect* player2);
@@ -36,7 +36,7 @@ namespace Pong
 		Mix_Chunk* collide;
 		Mix_Chunk* point;
 
-		static const int offsetcap = 50; //should stay >0
+		int offsetcap = 200; //should stay >0
 		bool offsetMode = false;
 	};
 
@@ -55,7 +55,7 @@ namespace Pong
 		return &rect;
 	}
 
-	Ball::Ball(std::pair<unsigned, unsigned>* _score, Uint64* _frames, bool mode, int _WIDTH, int _HEIGHT)
+	Ball::Ball(std::pair<unsigned, unsigned>* _score, Uint64* _frames, bool mode, int _WIDTH, int _HEIGHT, int cap)
 	{
 		using namespace Pong;
 		srand(time(0));
@@ -69,6 +69,7 @@ namespace Pong
 		score = _score;
 		offsetMode = mode;
 		frames = _frames;
+		offsetcap = cap;
 	}
 
 	void Ball::reset()
@@ -89,7 +90,7 @@ namespace Pong
 			score->first++;
 			if (audio)
 			{
-				Mix_PlayChannel(-1, point, 0);
+				//Mix_PlayChannel(-1, point, 0);
 			}
 			//std::cout << score->first << " - " << score->second << "\n";
 		}
@@ -100,7 +101,7 @@ namespace Pong
 			score->second++;
 			if (audio)
 			{
-				Mix_PlayChannel(-1, point, 0);
+				//Mix_PlayChannel(-1, point, 0);
 			}
 			//std::cout << score->first << " - " << score->second << "\n";
 		}
@@ -111,7 +112,7 @@ namespace Pong
 			yoffset *= -1;
 			if (audio)
 			{
-				Mix_PlayChannel(-1, collide, 0);
+				//Mix_PlayChannel(-1, collide, 0);
 			}
 		}
 		else if (rect.y <= 0)
@@ -121,7 +122,7 @@ namespace Pong
 			yoffset *= -1;
 			if (audio)
 			{
-				Mix_PlayChannel(-1, collide, 0);
+				//Mix_PlayChannel(-1, collide, 0);
 			}
 		}
 	}
@@ -150,7 +151,7 @@ namespace Pong
 		SDL_Rect intersect;
 		if (SDL_IntersectRect(&rect, player1, &intersect))
 		{
-			Mix_PlayChannel(-1, collide, 0);
+			//Mix_PlayChannel(-1, collide, 0);
 			rect.x += intersect.w;
 			xvel *= -1;
 			xoffset *= -1;
@@ -162,7 +163,7 @@ namespace Pong
 		}
 		else if (SDL_IntersectRect(&rect, player2, &intersect))
 		{
-			Mix_PlayChannel(-1, collide, 0);
+			//Mix_PlayChannel(-1, collide, 0);
 			rect.x -= intersect.w;
 			xvel *= -1;
 			xoffset *= -1;
